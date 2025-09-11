@@ -1,0 +1,115 @@
+<!-- sensor-monitor.component.html -->
+<div class="container py-4">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">
+          <i class="bi bi-thermometer-half"></i> Monitoreo de Sensores
+        </h2>
+        <div class="d-flex align-items-center">
+          <small class="text-muted me-3">
+            Última actualización: {{ lastRefresh | date:'HH:mm:ss' }}
+          </small>
+          <button class="btn btn-outline-primary btn-sm" (click)="refreshData()">
+            <i class="bi bi-arrow-clockwise"></i> Actualizar
+          </button>
+        </div>
+      </div>
+      <hr>
+    </div>
+  </div>
+
+  <!-- Grid de sensores -->
+  <div class="row">
+    <div class="col-xl-4 col-md-6 mb-4" *ngFor="let sensor of sensors">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-header bg-white border-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+              {{ getSensorIcon(sensor.name) }} {{ sensor.name }}
+            </h5>
+            <span class="badge" [ngClass]="getStatusClass(sensor.status)">
+              {{ getStatusText(sensor.status) }}
+            </span>
+          </div>
+          <small class="text-muted">{{ sensor.location }}</small>
+        </div>
+        <div class="card-body">
+          <div class="text-center mb-3">
+            <div class="display-4 fw-bold text-primary">
+              {{ sensor.value }}
+              <small class="text-muted fs-6">{{ sensor.unit }}</small>
+            </div>
+          </div>
+          
+          <!-- Barra de progreso -->
+          <div class="progress mb-2" style="height: 8px;">
+            <div class="progress-bar" 
+                 [ngClass]="{
+                   'bg-success': sensor.status === 'normal',
+                   'bg-warning': sensor.status === 'warning',
+                   'bg-danger': sensor.status === 'danger'
+                 }"
+                 [style.width.%]="getProgressPercentage(sensor)">
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between small text-muted">
+            <span>0</span>
+            <span>{{ getMaxValue(sensor) }}</span>
+          </div>
+        </div>
+        <div class="card-footer bg-white border-0">
+          <small class="text-muted">
+            <i class="bi bi-clock"></i> {{ sensor.lastUpdate | date:'HH:mm:ss' }}
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla resumen -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0"><i class="bi bi-table"></i> Resumen de Sensores</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Sensor</th>
+                  <th>Ubicación</th>
+                  <th>Valor</th>
+                  <th>Estado</th>
+                  <th>Última Actualización</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let sensor of sensors">
+                  <td>
+                    <strong>{{ getSensorIcon(sensor.name) }} {{ sensor.name }}</strong>
+                  </td>
+                  <td>{{ sensor.location }}</td>
+                  <td>
+                    <span class="fw-bold">{{ sensor.value }} {{ sensor.unit }}</span>
+                  </td>
+                  <td>
+                    <span class="badge" [ngClass]="getStatusClass(sensor.status)">
+                      {{ getStatusText(sensor.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    <small>{{ sensor.lastUpdate | date:'dd/MM/yyyy HH:mm:ss' }}</small>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

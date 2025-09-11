@@ -1,0 +1,24 @@
+.card {
+  border-radius: 12px;
+  background-color: #ffffff;
+}
+
+h3, h4 {
+  font-weight: 600;
+}
+
+label {
+  font-size: 0.95rem;
+}
+
+input, select {
+  border-radius: 8px !important;
+}
+
+.table th, .table td {
+  vertical-align: middle;
+}
+
+.table thead {
+  font-size: 0.9rem;
+}

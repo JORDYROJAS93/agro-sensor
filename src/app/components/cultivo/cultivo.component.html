@@ -1,0 +1,75 @@
+<div class="container mt-4">
+
+    <!-- 🔹 Combo de sensores -->
+    <div class="mb-3">
+        <label for="sensorSelect" class="form-label fw-bold">Selecciona un sensor:</label>
+        <select id="sensorSelect" class="form-select" (change)="onSelectSensor($event)">
+            <option value="" disabled selected>Selecciona un sensor</option>
+            <option *ngFor="let s of sensores" [value]="s.id">
+                {{ s.name }}
+            </option>
+        </select>
+    </div>
+
+    <!-- 🔹 Terreno dividido en sectores -->
+    <div class="terreno ">
+        <div class="sector sector-a" (click)="onSelectSector('Sector A')">
+            <strong>Sector A</strong>
+        </div>
+        <div class="sector sector-b" (click)="onSelectSector('Sector B')">
+            <strong>Sector B</strong>
+        </div>
+        <div class="sector sector-c" (click)="onSelectSector('Sector C')">
+            <strong>Sector C</strong>
+        </div>
+        <div class="sector sector-invernadero" (click)="onSelectSector('Invernadero')">
+            <strong>Invernadero</strong>
+        </div>
+    </div>
+
+    <!-- 🔹 Detalles del sensor seleccionado -->
+    <div *ngIf="sensorSeleccionado; else noSelection" class="mt-4 card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">
+                {{ getNombreConUbicacion(sensorSeleccionado) }}
+                <small *ngIf="sensorSeleccionado.id === -1" class="text-muted fw-normal">
+                </small>
+            </h5>
+
+            <p class="card-text">
+                <strong>Valor:</strong>
+                {{ sensorSeleccionado.value }} {{ sensorSeleccionado.unit }}
+            </p>
+
+            <p class="card-text">
+                <strong>Estado:</strong>
+                <span [ngClass]="{
+          'text-success fw-bold': sensorSeleccionado.status === 'normal',
+          'text-warning fw-bold': sensorSeleccionado.status === 'warning',
+          'text-danger fw-bold': sensorSeleccionado.status === 'danger'
+        }">
+                    {{ sensorSeleccionado.status }}
+                </span>
+            </p>
+
+            <p class="card-text">
+                <strong>Última actualización:</strong>
+                {{ sensorSeleccionado.lastUpdate | date:'short' }}
+            </p>
+
+            <p class="card-text">
+                <strong>Ubicación:</strong>
+                {{ sensorSeleccionado.location }}
+            </p>
+        </div>
+    </div>
+
+    <!-- 🔹 Mensaje cuando no hay sensor seleccionado -->
+    <ng-template #noSelection>
+        <div class="alert alert-info mt-4">
+            <i class="bi bi-info-circle"></i>
+            Selecciona un sensor del menú o haz clic en un sector para ver detalles.
+        </div>
+    </ng-template>
+
+</div>

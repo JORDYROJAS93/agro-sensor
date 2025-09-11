@@ -1,0 +1,52 @@
+<div class="container mt-4">
+  <div class="row g-4">
+
+    <!-- Humedad -->
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title">💧 Humedad del Suelo</h5>
+          <canvas id="humidityChart" width="100%" height="100"></canvas>
+          <small class="text-muted d-block mt-2">Última medición: hace 5 minutos</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Temperatura -->
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title">🌡️ Temperatura Ambiental</h5>
+          <canvas id="temperatureChart" width="100%" height="100"></canvas>
+          <small class="text-muted d-block mt-2">Promedio semanal: 21.5°C</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Luz Solar -->
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title">☀️ Nivel de Luz Solar</h5>
+          <canvas id="lightChart" width="100%" height="100"></canvas>
+          <small class="text-muted d-block mt-2">Máximo hoy: 98%</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen Semanal -->
+    <div class="col-md-12">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title">📅 Resumen Semanal</h5>
+          <canvas id="weeklySummaryChart" height="100"></canvas>
+          <div class="d-flex justify-content-between mt-2">
+            <small><span class="badge bg-info">Humedad:</span> Promedio: 42%</small>
+            <small><span class="badge bg-primary">Temperatura:</span> Máx: 28°C</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

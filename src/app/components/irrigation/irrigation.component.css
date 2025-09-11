@@ -1,0 +1,19 @@
+.bg-gradient {
+  background-image: linear-gradient(to right, #a8edea, #fed6e3);
+}
+
+.card-title {
+  color: #333;
+}
+
+.form-select-lg {
+  font-size: 1.1rem;
+  padding: 0.75rem 1rem;
+}
+
+.progress-bar {
+  transition: width 0.5s ease-in-out;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+}

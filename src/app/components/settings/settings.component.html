@@ -1,0 +1,118 @@
+<div class="container-fluid mt-4">
+  <h3 class="mb-4">⚙ Configuración del Sistema</h3>
+
+  <!-- Información del Cultivo -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3">
+      <h5 class="mb-0">🌱 Datos del Cultivo</h5>
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="saveCropSettings()" #cropForm="ngForm">
+
+        <div class="mb-3">
+          <label for="cropType" class="form-label">Tipo de Cultivo</label>
+          <input type="text"
+                 class="form-control"
+                 id="cropType"
+                 placeholder="Ej: Maíz, Tomate, Papa"
+                 [(ngModel)]="settings.cropType"
+                 name="cropType"
+                 required>
+        </div>
+
+        <div class="mb-3">
+          <label for="location" class="form-label">Ubicación del Campo</label>
+          <input type="text"
+                 class="form-control"
+                 id="location"
+                 placeholder="Ej: Valle del Cauca, Colombia"
+                 [(ngModel)]="settings.location"
+                 name="location"
+                 required>
+        </div>
+
+        <button type="submit" class="btn btn-success">
+          <i class="bi bi-save me-2"></i>Guardar Cambios
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sensores Activos -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3">
+      <h5 class="mb-0">📡 Sensores Disponibles</h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted mb-3">Activa o desactiva los sensores según tu configuración:</p>
+
+      <div *ngFor="let sensor of settings.sensors" class="form-check mb-2">
+        <input class="form-check-input"
+               type="checkbox"
+               [id]="'sensor-' + sensor.id"
+               [(ngModel)]="sensor.active"
+               [name]="'sensor' + sensor.id">
+        <label class="form-check-label" [for]="'sensor-' + sensor.id">
+          {{ sensor.name }}
+        </label>
+      </div>
+
+      <button class="btn btn-outline-primary mt-3" (click)="checkSensorStatus()">
+        <i class="bi bi-arrow-repeat me-2"></i>Verificar Estado
+      </button>
+    </div>
+  </div>
+
+  <!-- Notificaciones -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3">
+      <h5 class="mb-0">🔔 Ajustes de Notificaciones</h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted mb-3">Elige cómo deseas recibir alertas:</p>
+
+      <div class="row g-3">
+        <div class="col-md-4" *ngFor="let notification of settings.notifications">
+          <div class="form-check form-switch">
+            <input class="form-check-input"
+                   type="checkbox"
+                   [id]="'notif-' + notification.type"
+                   [(ngModel)]="notification.enabled"
+                   [name]="'notif' + notification.type">
+            <label class="form-check-label" [for]="'notif-' + notification.type">
+              {{ notification.label }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-success mt-3">
+        <i class="bi bi-save me-2"></i>Guardar Preferencias
+      </button>
+    </div>
+  </div>
+
+  <!-- Integraciones -->
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3">
+      <h5 class="mb-0">🔌 Integraciones Externas</h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted mb-3">Conecta servicios externos como APIs climáticas:</p>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span>API de Clima - OpenWeatherMap</span>
+        <button class="btn btn-outline-secondary btn-sm">
+          {{ settings.weatherApiConnected ? 'Desconectar' : 'Conectar' }}
+        </button>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center">
+        <span>Notificaciones Push - Firebase</span>
+        <button class="btn btn-outline-secondary btn-sm">
+          {{ settings.pushNotifications ? 'Desactivar' : 'Activar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

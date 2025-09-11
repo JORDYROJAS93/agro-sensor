@@ -1,0 +1,86 @@
+<div class="container-fluid mt-4">
+  <h3 class="mb-4">💧 Control de Riego</h3>
+
+  <!-- Tarjeta de Acción Manual -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <h5 class="card-title">🔧 Control Manual</h5>
+      <p class="card-text text-muted">Activa el riego manualmente por un tiempo específico.</p>
+
+      <div class="row align-items-center g-3">
+        <div class="col-md-8">
+          <input type="number" class="form-control form-control-lg" [(ngModel)]="manualDuration" placeholder="Duración en minutos" min="1">
+        </div>
+        <div class="col-md-4 d-grid">
+          <button class="btn btn-success btn-lg" (click)="startManualIrrigation()">
+            <i class="bi bi-play-circle me-2"></i>Activar Riego
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarjeta de Modo Automático -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <h5 class="card-title">🤖 Modo Automático</h5>
+      <p class="card-text text-muted">Configura el sistema para activar riego automáticamente según la humedad del suelo.</p>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <label for="autoModeSwitch" class="form-check-label fw-bold">Activar modo automático</label>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="autoModeSwitch" [(ngModel)]="autoMode">
+        </div>
+      </div>
+
+      <div class="row align-items-center g-3" [class.text-muted]="!autoMode">
+        <div class="col-md-6">
+          <label class="form-label">Umbral de Humedad (%)</label>
+          <select class="form-select form-select-lg" [(ngModel)]="moistureThreshold" [disabled]="!autoMode">
+            <option *ngFor="let threshold of moistureThresholds" [value]="threshold">
+              {{ threshold }}%
+            </option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Estado actual del suelo</label>
+          <div class="progress" style="height: 30px;">
+            <div class="progress-bar bg-gradient"
+                 [ngClass]="{
+                   'bg-danger': currentMoisture <= 25,
+                   'bg-warning': currentMoisture > 25 && currentMoisture <= 40,
+                   'bg-success': currentMoisture > 40
+                 }"
+                 [style.width.%]="currentMoisture"
+                 role="progressbar">
+              {{ currentMoisture }}%
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Información del Sistema -->
+  <div class="card shadow-sm border-0">
+    <div class="card-body">
+      <h5 class="card-title">📡 Estado del Sistema</h5>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-droplet-fill me-2"></i>Humedad actual</span>
+          <span class="badge bg-primary rounded-pill">{{ currentMoisture }}%</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-clock-history me-2"></i>Último ciclo</span>
+          <span class="badge bg-secondary rounded-pill">Hace 2 horas</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-power me-2"></i>Modo actual</span>
+          <span class="badge" [ngClass]="autoMode ? 'bg-success' : 'bg-info'">
+            {{ autoMode ? 'Automático' : 'Manual' }}
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

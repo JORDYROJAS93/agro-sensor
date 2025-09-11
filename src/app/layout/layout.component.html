@@ -1,0 +1,72 @@
+<div class="app-container d-flex vh-100">
+  <!-- Sidebar -->
+  <nav class="d-flex flex-column p-3 text-white bg-dark" style="width: 250px;">
+    <div class="logo d-flex align-items-center mb-4">
+      <img src="/assets/img/logo.png" alt="Logo AgroSensor" width="30">
+      <span class="ms-2 fs-5">AgroSensor</span>
+    </div>
+
+    <ul class="nav nav-pills flex-column mb-auto">
+      <li class="nav-item">
+        <a [routerLink]="['/app/home']" class="nav-link text-white" routerLinkActive="active">
+          🏚️ Home
+        </a>
+      </li>
+      <li class="nav-item">
+        <a [routerLink]="['/app/dashboard']" class="nav-link text-white" routerLinkActive="active">
+          📊 Dashboard
+        </a>
+      </li>
+      <li>
+        <a [routerLink]="['/app/alerts']" class="nav-link text-white" routerLinkActive="active">
+          🚨 Alertas
+        </a>
+      </li>
+      <li>
+        <a [routerLink]="['/app/monitor']" class="nav-link text-white" routerLinkActive="active">
+          ⏱️ Tiempo Real
+        </a>
+      </li>
+      <li>
+        <a [routerLink]="['/app/irrigation']" class="nav-link text-white" routerLinkActive="active">
+          💧 Riego
+        </a>
+      </li>
+      <li>
+        <a [routerLink]="['/app/settings']" class="nav-link text-white" routerLinkActive="active">
+          ⚙ Configuración
+        </a>
+      </li>
+      <li>
+        <a [routerLink]="['/app/profile']" class="nav-link text-white" routerLinkActive="active">
+          👤 Perfil
+        </a>
+      </li>
+      <li>
+        <a [routerLink]="['/app/weather']" class="nav-link text-white" routerLinkActive="active">
+          ☀️ Clima
+        </a>
+      </li>
+      <li>
+        <a [routerLink]="['/app/dispositivos']" class="nav-link text-white" routerLinkActive="active">
+          🧪 dispositivos
+        </a>
+      </li>
+      <li>
+        <a [routerLink]="['/app/cultivo']" class="nav-link text-white" routerLinkActive="active">
+          🌾 Cultivo
+        </a>
+      </li>
+    </ul>
+
+    <hr>
+    <button (click)="logout()" class="btn btn-outline-light mt-auto">
+      Cerrar Sesión
+    </button>
+  </nav>
+
+  <!-- Contenido dinámico -->
+  <div class="content flex-grow-1 p-4 bg-light overflow-auto">
+    <router-outlet></router-outlet>
+  </div>
+</div>

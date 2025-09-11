@@ -1,0 +1,75 @@
+<div class="card bg-light mb-3">
+  <div class="container mt-4">
+    <div class="card-header bg-primary text-white">
+      <h3 class="mb-1">⚙️ Configurar Alertas</h3>
+    </div>
+
+    <form (ngSubmit)="saveAlertConfig()" #alertForm="ngForm">
+      <!-- Selección de sensor -->
+      <div class="mb-3 col-md-6">
+        <label for="sensor" class="form-label">Selecciona un Sensor</label>
+        <select class="form-select" id="sensor" [(ngModel)]="selectedSensorId" name="sensor" required>
+          <option *ngFor="let sensor of sensors" [value]="sensor.id">
+            {{ sensor.name }} - {{ sensor.location }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Valores mínimos y máximos -->
+      <div class="row mb-3">
+        <div class="mb-3 col-md-6">
+          <label for="min" class="form-label">Valor Mínimo</label>
+          <input type="number" class="form-control" id="min" [(ngModel)]="minValue" name="min" required>
+        </div>
+
+        <div class="mb-3 col-md-6">
+          <label for="max" class="form-label">Valor Máximo</label>
+          <input type="number" class="form-control" id="max" [(ngModel)]="maxValue" name="max" required>
+        </div>
+      </div>
+      <!-- Canal de notificación -->
+      <div class="row mb-3">
+        <div class="mb-3 col-md-6">
+          <label class="form-label">Canal de Notificación</label>
+          <select class="form-select" [(ngModel)]="notificationChannel" name="channel" required>
+            <option value="app">Notificación en la App</option>
+            <option value="email">Correo Electrónico</option>
+            <option value="sms">SMS</option>
+          </select>
+        </div>
+        <div class="mb-3 col-md-6">
+          <br>
+          <button type="submit" class="btn btn-primary mb-3" [disabled]="!alertForm.form.valid">
+            Guardar Configuración
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+<hr> <br>
+<h3>Alertas Registradas</h3>
+<table class="table table-striped" id="tablaAlertas">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Sensor</th>
+      <th>Mínimo</th>
+      <th>Máximo</th>
+      <th>Fecha y Hora</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let alerta of alertas; let alertaIndex = index">
+
+      <td>{{ alerta.numero }}</td>
+      <td>{{ alerta.sensor }}</td>
+      <td>{{ alerta.min }}</td>
+      <td>{{ alerta.max }}</td>
+      <td>{{ alerta.fecha }}</td>
+    </tr>
+  </tbody>
+</table>

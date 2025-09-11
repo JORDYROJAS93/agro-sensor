@@ -1,0 +1,33 @@
+<div class="d-flex flex-column align-items-center justify-content-center vh-100 bg-light text-center">
+  <!-- Icono de carga -->
+  <div class="mb-4 spinner-border text-success" role="status" style="width: 60px; height: 60px;">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+
+  <!-- Mensaje principal -->
+  <h4 class="mb-3">🔌 Conectando Sensores</h4>
+  <p class="text-muted">Estableciendo conexión con los dispositivos del campo...</p>
+
+  <!-- Barra de progreso (opcional) -->
+  <div class="progress w-50 my-4" style="height: 8px;">
+    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: 70%">
+      <span class="visually-hidden">70% Completo</span>
+    </div>
+  </div>
+
+  <!-- Lista de dispositivos conectados -->
+  <ul class="list-group list-group-flush w-50 mt-3">
+    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+      Sensor de Humedad
+      <i class="bi bi-check-circle-fill text-success"></i>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+      Sensor de Temperatura
+      <i class="bi bi-hourglass-split text-warning"></i>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+      Sistema de Riego
+      <i class="bi bi-exclamation-circle-fill text-danger"></i>
+    </li>
+  </ul>
+</div>
