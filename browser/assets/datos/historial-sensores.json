@@ -1,0 +1,22 @@
+[
+  { "fecha": "2025-10-15 08:00:00", "tipoSensor": "Humedad Suelo", "ubicacion": "Sector A", "valor": 45.2, "unidad": "%" },
+  { "fecha": "2025-10-15 08:00:00", "tipoSensor": "Temperatura Ambiente", "ubicacion": "Sector B", "valor": 28.5, "unidad": "°C" },
+  { "fecha": "2025-10-15 10:00:00", "tipoSensor": "Humedad Suelo", "ubicacion": "Invernadero", "valor": 70.1, "unidad": "%" },
+  { "fecha": "2025-10-15 10:00:00", "tipoSensor": "Luminosidad", "ubicacion": "Sector C", "valor": 850, "unidad": "lux" },
+  { "fecha": "2025-10-16 09:30:00", "tipoSensor": "Temperatura Ambiente", "ubicacion": "Sector A", "valor": 22.0, "unidad": "°C" },
+  { "fecha": "2025-10-16 11:00:00", "tipoSensor": "Humedad Suelo", "ubicacion": "Sector B", "valor": 55.5, "unidad": "%" },
+  { "fecha": "2025-10-17 14:00:00", "tipoSensor": "pH", "ubicacion": "Invernadero", "valor": 6.5, "unidad": "" },
+  { "fecha": "2025-10-17 14:30:00", "tipoSensor": "Luminosidad", "ubicacion": "Exterior", "valor": 950, "unidad": "lux" },
+  { "fecha": "2025-10-18 12:00:00", "tipoSensor": "Humedad Suelo", "ubicacion": "Sector C", "valor": 38.0, "unidad": "%" },
+  { "fecha": "2025-10-18 12:00:00", "tipoSensor": "Temperatura Ambiente", "ubicacion": "Exterior", "valor": 21.5, "unidad": "°C" },
+  { "fecha": "2025-10-19 15:00:00", "tipoSensor": "Humedad Suelo", "ubicacion": "Sector A", "valor": 42.3, "unidad": "%" },
+  { "fecha": "2025-10-19 15:30:00", "tipoSensor": "Temperatura Ambiente", "ubicacion": "Sector B", "valor": 27.8, "unidad": "°C" },
+  { "fecha": "2025-10-20 09:00:00", "tipoSensor": "pH", "ubicacion": "Invernadero", "valor": 6.8, "unidad": "" },
+  { "fecha": "2025-10-20 09:30:00", "tipoSensor": "Luminosidad", "ubicacion": "Sector C", "valor": 900, "unidad": "lux" },
+  { "fecha": "2025-10-21 11:00:00", "tipoSensor": "Humedad Suelo", "ubicacion": "Sector A", "valor": 50.0, "unidad": "%" },
+  { "fecha": "2025-10-21 11:30:00", "tipoSensor": "Temperatura Ambiente", "ubicacion": "Sector B", "valor": 26.4, "unidad": "°C" },
+  { "fecha": "2025-10-22 13:00:00", "tipoSensor": "Humedad Suelo", "ubicacion": "Invernadero", "valor": 68.2, "unidad": "%" },
+  { "fecha": "2025-10-22 13:30:00", "tipoSensor": "Luminosidad", "ubicacion": "Exterior", "valor": 1000, "unidad": "lux" },
+  { "fecha": "2025-10-23 10:00:00", "tipoSensor": "Temperatura Ambiente", "ubicacion": "Sector C", "valor": 23.5, "unidad": "°C" },
+  { "fecha": "2025-10-23 10:30:00", "tipoSensor": "Humedad Suelo", "ubicacion": "Sector A", "valor": 47.6, "unidad": "%" }
+]
