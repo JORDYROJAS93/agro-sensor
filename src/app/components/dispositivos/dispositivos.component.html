@@ -1,18 +1,18 @@
 <div class="container py-5">
-  <div class="card shadow-sm border-0">
+  <div class="card shadow-lg border-0">
     <div class="card-body p-4">
 
-      <!-- Título -->
-      <h4 class="fw-bold mb-4 text-primary">Administrar Sensores IoT</h4>
+      <h4 class="fw-bold mb-4 text-primary"><i class="bi bi-gear-wide-connected me-2"></i> Administrar Sensores IoT</h4>
 
-      <!-- Botón nuevo dispositivo -->
-      <button class="btn btn-success mb-3" (click)="nuevoDispositivo()">
-        <i class="bi bi-plus-circle me-2"></i> Registrar Sensor
+      <button class="btn btn-success mb-3" 
+              data-bs-toggle="modal" 
+              data-bs-target="#sensorModal" 
+              (click)="nuevoDispositivo()">
+        <i class="bi bi-plus-circle me-2"></i> Agregar Sensor
       </button>
 
-      <!-- Tabla de sensores -->
       <div class="table-responsive">
-        <table class="table table-striped align-middle">
+        <table class="table table-hover table-striped align-middle">
           <thead class="table-dark">
             <tr>
               <th>ID</th>
@@ -21,6 +21,7 @@
               <th>Valor</th>
               <th>Unidad</th>
               <th>Estado</th>
+              <th>Última Actualización</th>
               <th class="text-center">Acciones</th>
             </tr>
           </thead>
@@ -29,71 +30,101 @@
               <td>{{ dispositivo.id }}</td>
               <td>{{ dispositivo.name }}</td>
               <td>{{ dispositivo.location }}</td>
-              <td>{{ dispositivo.value }}</td>
-              <td>{{ dispositivo.unit }}</td>
+              <td>{{ dispositivo.value | number:'1.0-2' }}</td> <td>{{ dispositivo.unit }}</td>
               <td>
                 <span class="badge" [ngClass]="{
-                        'bg-success': dispositivo.status === 'normal',
-                        'bg-warning': dispositivo.status === 'warning',
-                        'bg-danger': dispositivo.status === 'danger'
-                      }">
+                          'bg-success': dispositivo.status === 'normal',
+                          'bg-warning': dispositivo.status === 'warning',
+                          'bg-danger': dispositivo.status === 'danger'
+                        }">
                   {{ getStatusText(dispositivo.status) }}
                 </span>
               </td>
               <td>
-                <button class="btn btn-primary btn-sm me-2">
+                 {{ dispositivo.lastUpdate | date:'short' }} 
+              </td>
+              <td class="text-center">
+                <button class="btn btn-primary btn-sm me-2" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#sensorModal" 
+                        (click)="editarDispositivo(dispositivo)">
                   <i class="bi bi-pencil"></i> Editar
                 </button>
-                <button class="btn btn-danger btn-sm">
+                <button class="btn btn-danger btn-sm" (click)="eliminarDispositivo(dispositivo)">
                   <i class="bi bi-trash"></i> Eliminar
                 </button>
               </td>
+            </tr>
+            <tr *ngIf="dispositivos.length === 0">
+              <td colspan="8" class="text-center text-muted">No hay sensores registrados.</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Formulario de registro/edición -->
-      <div *ngIf="formVisible" class="mt-4">
-        <h5>{{ editando ? 'Editar Sensor' : 'Registrar Sensor' }}</h5>
-        <form (ngSubmit)="guardarDispositivo()" #form="ngForm">
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="sensorModal" tabindex="-1" aria-labelledby="sensorModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <div class="modal-header" [ngClass]="editando ? 'bg-warning text-dark' : 'bg-primary text-white'">
+        <h5 class="modal-title" id="sensorModalLabel">
+          <i class="bi bi-tools me-2"></i> {{ editando ? 'Editar Sensor' : 'Registrar Nuevo Sensor' }}
+        </h5>
+        <button type="button" class="btn-close" [ngClass]="editando ? 'btn-close-dark' : 'btn-close-white'" data-bs-dismiss="modal" aria-label="Close" (click)="cancelar()"></button>
+      </div>
+
+      <form (ngSubmit)="guardarDispositivo()" #form="ngForm">
+        <div class="modal-body">
+          
+          <div *ngIf="editando" class="mb-3">
+             <small class="text-muted">ID: {{ dispositivoSeleccionado.id }}</small>
+          </div>
 
           <div class="mb-3">
-            <label class="form-label">Nombre</label>
+            <label class="form-label">Nombre del Sensor <span class="text-danger">*</span></label>
             <input type="text" [(ngModel)]="dispositivoSeleccionado.name" name="name" class="form-control" required>
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Ubicación</label>
-            <input type="text" [(ngModel)]="dispositivoSeleccionado.location" name="location" class="form-control"
-              required>
+            <label class="form-label">Ubicación <span class="text-danger">*</span></label>
+            <input type="text" [(ngModel)]="dispositivoSeleccionado.location" name="location" class="form-control" required>
           </div>
 
-          <div class="mb-3">
-            <label class="form-label">Valor</label>
-            <input type="number" [(ngModel)]="dispositivoSeleccionado.value" name="value" class="form-control" required>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Valor Inicial <span class="text-danger">*</span></label>
+              <input type="number" [(ngModel)]="dispositivoSeleccionado.value" name="value" class="form-control" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Unidad (ej: °C, %, lux) <span class="text-danger">*</span></label>
+              <input type="text" [(ngModel)]="dispositivoSeleccionado.unit" name="unit" class="form-control" required>
+            </div>
           </div>
-
+          
           <div class="mb-3">
-            <label class="form-label">Unidad</label>
-            <input type="text" [(ngModel)]="dispositivoSeleccionado.unit" name="unit" class="form-control" required>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Estado</label>
+            <label class="form-label">Estado Inicial</label>
             <select [(ngModel)]="dispositivoSeleccionado.status" name="status" class="form-select">
               <option value="normal">Normal</option>
               <option value="warning">Advertencia</option>
               <option value="danger">Crítico</option>
             </select>
           </div>
+        </div>
 
-          <button type="submit" class="btn btn-primary me-2">
-            {{ editando ? 'Guardar Cambios' : 'Registrar' }}
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="cancelar()">
+            <i class="bi bi-x-lg"></i> Cancelar
           </button>
-          <button type="button" class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
-        </form>
-      </div>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid" data-bs-dismiss="modal">
+            <i class="bi bi-save"></i> {{ editando ? 'Guardar Cambios' : 'Registrar Sensor' }}
+          </button>
+        </div>
+      </form>
 
     </div>
   </div>

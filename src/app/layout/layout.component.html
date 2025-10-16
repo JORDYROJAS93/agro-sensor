@@ -2,11 +2,16 @@
   <!-- Sidebar -->
   <nav class="d-flex flex-column p-3 text-white bg-dark" style="width: 250px;">
     <div class="logo d-flex align-items-center mb-4">
-      <img src="/assets/img/logo.png" alt="Logo AgroSensor" width="30">
+      <img src="assets/img/logo.png" alt="Logo AgroSensor" width="30">
       <span class="ms-2 fs-5">AgroSensor</span>
     </div>
 
     <ul class="nav nav-pills flex-column mb-auto">
+      <li>
+        <a [routerLink]="['/app/profile']" class="nav-link text-white" routerLinkActive="active">
+          👤 Perfil
+        </a>
+      </li>
       <li class="nav-item">
         <a [routerLink]="['/app/home']" class="nav-link text-white" routerLinkActive="active">
           🏚️ Home
@@ -32,16 +37,7 @@
           💧 Riego
         </a>
       </li>
-      <li>
-        <a [routerLink]="['/app/settings']" class="nav-link text-white" routerLinkActive="active">
-          ⚙ Configuración
-        </a>
-      </li>
-      <li>
-        <a [routerLink]="['/app/profile']" class="nav-link text-white" routerLinkActive="active">
-          👤 Perfil
-        </a>
-      </li>
+      
       <li>
         <a [routerLink]="['/app/weather']" class="nav-link text-white" routerLinkActive="active">
           ☀️ Clima

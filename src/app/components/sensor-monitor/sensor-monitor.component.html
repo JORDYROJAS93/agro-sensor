@@ -8,14 +8,21 @@
         </h2>
         <div class="d-flex align-items-center">
           <small class="text-muted me-3">
-            Última actualización: {{ lastRefresh | date:'HH:mm:ss' }}
+            Última actualización: {{ lastRefresh | date : "HH:mm:ss" }}
           </small>
-          <button class="btn btn-outline-primary btn-sm" (click)="refreshData()">
+          
+          <button class="btn btn-success btn-sm me-2" (click)="exportToPdf()">
+            <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+          </button>
+          <button
+            class="btn btn-outline-primary btn-sm"
+            (click)="refreshData()"
+          >
             <i class="bi bi-arrow-clockwise"></i> Actualizar
           </button>
         </div>
       </div>
-      <hr>
+      <hr />
     </div>
   </div>
 
@@ -41,19 +48,20 @@
               <small class="text-muted fs-6">{{ sensor.unit }}</small>
             </div>
           </div>
-          
+
           <!-- Barra de progreso -->
-          <div class="progress mb-2" style="height: 8px;">
-            <div class="progress-bar" 
-                 [ngClass]="{
-                   'bg-success': sensor.status === 'normal',
-                   'bg-warning': sensor.status === 'warning',
-                   'bg-danger': sensor.status === 'danger'
-                 }"
-                 [style.width.%]="getProgressPercentage(sensor)">
-            </div>
+          <div class="progress mb-2" style="height: 8px">
+            <div
+              class="progress-bar"
+              [ngClass]="{
+                'bg-success': sensor.status === 'normal',
+                'bg-warning': sensor.status === 'warning',
+                'bg-danger': sensor.status === 'danger'
+              }"
+              [style.width.%]="getProgressPercentage(sensor)"
+            ></div>
           </div>
-          
+
           <div class="d-flex justify-content-between small text-muted">
             <span>0</span>
             <span>{{ getMaxValue(sensor) }}</span>
@@ -61,7 +69,8 @@
         </div>
         <div class="card-footer bg-white border-0">
           <small class="text-muted">
-            <i class="bi bi-clock"></i> {{ sensor.lastUpdate | date:'HH:mm:ss' }}
+            <i class="bi bi-clock"></i>
+            {{ sensor.lastUpdate | date : "HH:mm:ss" }}
           </small>
         </div>
       </div>
@@ -76,7 +85,7 @@
           <h5 class="mb-0"><i class="bi bi-table"></i> Resumen de Sensores</h5>
         </div>
         <div class="card-body p-0">
-          <div class="table-responsive">
+          <div class="table-responsive" id="resumenSensores">
             <table class="table table-hover mb-0">
               <thead class="table-light">
                 <tr>
@@ -90,19 +99,29 @@
               <tbody>
                 <tr *ngFor="let sensor of sensors">
                   <td>
-                    <strong>{{ getSensorIcon(sensor.name) }} {{ sensor.name }}</strong>
+                    <strong
+                      >{{ getSensorIcon(sensor.name) }}
+                      {{ sensor.name }}</strong
+                    >
                   </td>
                   <td>{{ sensor.location }}</td>
                   <td>
-                    <span class="fw-bold">{{ sensor.value }} {{ sensor.unit }}</span>
+                    <span class="fw-bold"
+                      >{{ sensor.value }} {{ sensor.unit }}</span
+                    >
                   </td>
                   <td>
-                    <span class="badge" [ngClass]="getStatusClass(sensor.status)">
+                    <span
+                      class="badge"
+                      [ngClass]="getStatusClass(sensor.status)"
+                    >
                       {{ getStatusText(sensor.status) }}
                     </span>
                   </td>
                   <td>
-                    <small>{{ sensor.lastUpdate | date:'dd/MM/yyyy HH:mm:ss' }}</small>
+                    <small>{{
+                      sensor.lastUpdate | date : "dd/MM/yyyy HH:mm:ss"
+                    }}</small>
                   </td>
                 </tr>
               </tbody>

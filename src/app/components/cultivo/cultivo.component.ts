@@ -1,32 +1,132 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+// 1. Importar HttpClient y el módulo necesario
+import { HttpClient, HttpClientModule } from '@angular/common/http'; 
 import { SensorData } from '../../models/sensor.model';
 import { SensorService } from '../../services/sensor.service';
+import * as XLSX from 'xlsx';
+
+// Interfaz para el registro histórico
+interface LecturaHistorica {
+  fecha: string; 
+  tipoSensor: string;
+  ubicacion: string;
+  valor: number;
+  unidad: string;
+}
 
 @Component({
   selector: 'app-cultivo',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  // 🔴 CAMBIO CLAVE: Importamos HttpClientModule para asegurar que el proveedor esté disponible
+  imports: [CommonModule, FormsModule, HttpClientModule], 
   templateUrl: './cultivo.component.html',
   styleUrls: ['./cultivo.component.css']
 })
 export class CultivoComponent implements OnInit {
   sensores: SensorData[] = [];
   sensorSeleccionado: SensorData | null = null;
-  tipoSensorSeleccionado: string | null = null; // tipo inferido del sensor seleccionado
+  tipoSensorSeleccionado: string | null = null;
+  
+  // PROPIEDADES DE FILTRO
+  filtroSector: string = 'Todos'; 
+  fechaInicio: string = '';       
+  fechaFin: string = '';          
 
-  constructor(private sensorService: SensorService) { }
+  lecturasHistoricas: LecturaHistorica[] = []; 
+  
+  private historialDataUrl = 'assets/datos/historial-sensores.json'; 
+
+  // INYECCIÓN DEL SERVICIO HTTP
+  constructor(private sensorService: SensorService, private http: HttpClient) { } 
 
   ngOnInit(): void {
+    // Cargar la data de los sensores base
     this.sensorService.sensores$.subscribe(data => {
       this.sensores = data;
     });
-
     this.sensores = this.sensorService.getSensores();
+    
+    // Cargar la data del historial
+    this.cargarHistorial();
   }
 
-  // 🔹 Inferir el tipo de sensor basado en el nombre
+  // MÉTODO: Carga los datos del archivo JSON usando HttpClient
+  cargarHistorial(): void {
+      this.http.get<LecturaHistorica[]>(this.historialDataUrl)
+          .subscribe({
+              next: (data) => {
+                  this.lecturasHistoricas = data;
+              },
+              error: (err) => {
+                  console.error('Error al cargar el historial:', err);
+                  // En caso de error, muestra un mensaje
+                  alert('No se pudo cargar el historial de datos. Revisa la consola y el archivo JSON.');
+              }
+          });
+  }
+
+  // GETTER: Opciones disponibles para el filtro de sector
+  get sectoresDisponibles(): string[] {
+      return ['Todos', 'Sector A', 'Sector B', 'Sector C', 'Invernadero', 'Exterior'];
+  }
+
+  // GETTER: Aplica todos los filtros a la data del historial
+  get lecturasFiltradas(): LecturaHistorica[] {
+      let data = this.lecturasHistoricas;
+
+      if (this.filtroSector !== 'Todos') {
+          data = data.filter(lectura => lectura.ubicacion === this.filtroSector);
+      }
+
+      const start = this.fechaInicio ? new Date(this.fechaInicio) : null;
+      const end = this.fechaFin ? new Date(this.fechaFin) : null;
+
+      if (start || end) {
+          data = data.filter(lectura => {
+              // Solo compara la parte de la fecha (YYYY-MM-DD)
+              const registroDateString = lectura.fecha.split(' ')[0];
+              const fechaRegistro = new Date(registroDateString);
+              
+              let cumpleRango = true;
+
+              if (start && fechaRegistro < start) {
+                  cumpleRango = false;
+              }
+
+              if (end && fechaRegistro > end) {
+                  cumpleRango = false;
+              }
+              
+              return cumpleRango;
+          });
+      }
+
+      return data;
+  }
+
+  // MÉTODO: Exporta solo la data filtrada
+  exportToExcel(): void {
+    const dataToExport = this.lecturasFiltradas;
+    
+    if (dataToExport.length === 0) {
+      alert("No hay datos que coincidan con los filtros para exportar.");
+      return;
+    }
+
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataToExport);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'HistorialFiltrado');
+
+    const sectorNombre = this.filtroSector !== 'Todos' ? `_${this.filtroSector}` : '';
+    const excelFileName = `Historial_Cultivo${sectorNombre}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    XLSX.writeFile(wb, excelFileName);
+
+    alert(`¡Exportación exitosa! Se exportaron ${dataToExport.length} registros.`);
+  }
+  
+  // (El resto de métodos inferirTipo, onSelectSensor, etc. se mantienen igual)
   private inferirTipo(nombre: string): string {
     nombre = nombre.toLowerCase();
     if (nombre.includes('temperatura')) return 'temperature';
@@ -37,7 +137,6 @@ export class CultivoComponent implements OnInit {
     return 'unknown';
   }
 
-  // 🔹 Cuando se selecciona un sensor del combo
   onSelectSensor(event: Event) {
     const select = event.target as HTMLSelectElement;
     const sensorId = Number(select.value);
@@ -45,20 +144,16 @@ export class CultivoComponent implements OnInit {
 
     if (sensor) {
       this.sensorSeleccionado = sensor;
-      this.tipoSensorSeleccionado = this.inferirTipo(sensor.name); // inferimos el tipo
+      this.tipoSensorSeleccionado = this.inferirTipo(sensor.name);
     }
   }
 
-  // 🔹 Cuando se hace clic en un sector
   onSelectSector(location: string) {
     if (!this.tipoSensorSeleccionado) return;
-
-    // Busca un sensor del mismo tipo en esa ubicación
     let sensorEnZona = this.sensores.find(s =>
       s.location === location && this.inferirTipo(s.name) === this.tipoSensorSeleccionado
-    ) ?? null;  // ← AQUÍ: convierte undefined a null
+    ) ?? null;
 
-    // Si no existe, lo simulamos
     if (!sensorEnZona) {
       const baseSensor = this.sensores.find(s => this.inferirTipo(s.name) === this.tipoSensorSeleccionado) ?? null;
 
@@ -69,7 +164,6 @@ export class CultivoComponent implements OnInit {
           this.tipoSensorSeleccionado
         );
 
-        // Creamos un sensor simulado
         sensorEnZona = {
           ...baseSensor,
           value: newValue,
@@ -80,12 +174,9 @@ export class CultivoComponent implements OnInit {
         };
       }
     }
-
-    // Ahora seguro: sensorEnZona es SensorData | null
     this.sensorSeleccionado = sensorEnZona;
   }
 
-  // 🔹 Variación por sector y tipo
   private getVariation(location: string, type: string): number {
     const variaciones: Record<string, Record<string, number>> = {
       temperature: { 'Sector A': 1, 'Sector B': -1, 'Sector C': 0.5, 'Invernadero': 3, 'Exterior': -2 },
@@ -97,7 +188,6 @@ export class CultivoComponent implements OnInit {
     return variaciones[type]?.[location] || 0;
   }
 
-  // 🔹 Asegura valores dentro de rangos razonables
   private aplicarRango(value: number, type: string): number {
     switch (type) {
       case 'ph':
@@ -115,15 +205,10 @@ export class CultivoComponent implements OnInit {
     }
   }
 
-
   getNombreConUbicacion(sensor: SensorData): string {
-    // Extraemos el tipo base del nombre (sin la parte de ubicación)
     const nombreBase = sensor.name
       .replace(/\s*\(?(Sector [A-C]|Invernadero|Exterior)\)?/g, '')
       .trim();
-
     return `${nombreBase} (${sensor.location})`;
   }
-
-
 }

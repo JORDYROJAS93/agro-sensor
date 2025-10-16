@@ -1,21 +1,20 @@
 <div class="card bg-light mb-3">
   <div class="container mt-4">
     <div class="card-header bg-primary text-white">
-      <h3 class="mb-1">⚙️ Configurar Alertas</h3>
+      <h3 class="mb-1">⚙️ Configurar Alertas <span *ngIf="editingAlert"> (Editando Alerta #{{ editingAlert.id }})</span></h3>
     </div>
 
-    <form (ngSubmit)="saveAlertConfig()" #alertForm="ngForm">
-      <!-- Selección de sensor -->
+    <form (ngSubmit)="saveAlertConfig(alertForm)" #alertForm="ngForm"> 
       <div class="mb-3 col-md-6">
         <label for="sensor" class="form-label">Selecciona un Sensor</label>
         <select class="form-select" id="sensor" [(ngModel)]="selectedSensorId" name="sensor" required>
+          <option [ngValue]="null" disabled *ngIf="!selectedSensorId">-- Seleccionar Sensor --</option>
           <option *ngFor="let sensor of sensors" [value]="sensor.id">
             {{ sensor.name }} - {{ sensor.location }}
           </option>
         </select>
       </div>
 
-      <!-- Valores mínimos y máximos -->
       <div class="row mb-3">
         <div class="mb-3 col-md-6">
           <label for="min" class="form-label">Valor Mínimo</label>
@@ -27,7 +26,6 @@
           <input type="number" class="form-control" id="max" [(ngModel)]="maxValue" name="max" required>
         </div>
       </div>
-      <!-- Canal de notificación -->
       <div class="row mb-3">
         <div class="mb-3 col-md-6">
           <label class="form-label">Canal de Notificación</label>
@@ -37,10 +35,13 @@
             <option value="sms">SMS</option>
           </select>
         </div>
-        <div class="mb-3 col-md-6">
-          <br>
-          <button type="submit" class="btn btn-primary mb-3" [disabled]="!alertForm.form.valid">
-            Guardar Configuración
+        <div class="mb-3 col-md-6 d-flex align-items-end justify-content-end">
+          <button type="submit" class="btn btn-primary" [disabled]="!alertForm.form.valid">
+            <i class="bi bi-save"></i> 
+            {{ editingAlert ? 'Actualizar Alerta' : 'Guardar Configuración' }}
+          </button>
+          <button type="button" class="btn btn-secondary ms-2" *ngIf="editingAlert" (click)="editingAlert = null; alertForm.resetForm({ notificationChannel: 'app' })">
+            Cancelar
           </button>
         </div>
       </div>
@@ -48,9 +49,9 @@
   </div>
 </div>
 
+---
 
-
-<hr> <br>
+<br>
 <h3>Alertas Registradas</h3>
 <table class="table table-striped" id="tablaAlertas">
   <thead>
@@ -59,17 +60,37 @@
       <th>Sensor</th>
       <th>Mínimo</th>
       <th>Máximo</th>
-      <th>Fecha y Hora</th>
+      <th>Notificación</th> <th>Fecha y Hora</th>
+      <th>Acciones</th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let alerta of alertas; let alertaIndex = index">
-
-      <td>{{ alerta.numero }}</td>
+    <tr *ngFor="let alerta of alertas; let i = index">
+      <td>{{ alerta.id }}</td>
       <td>{{ alerta.sensor }}</td>
       <td>{{ alerta.min }}</td>
       <td>{{ alerta.max }}</td>
+      <td>
+        <span class="badge" [ngClass]="{
+            'bg-info': alerta.notificationChannel === 'app',
+            'bg-primary': alerta.notificationChannel === 'email',
+            'bg-warning': alerta.notificationChannel === 'sms'
+          }">
+          {{ getNotificationChannelName(alerta.notificationChannel) }}
+        </span>
+      </td>
       <td>{{ alerta.fecha }}</td>
+      <td>
+        <button class="btn btn-primary btn-sm me-2" (click)="editarAlerta(alerta)">
+          <i class="bi bi-pencil"></i> Editar
+        </button>
+        <button class="btn btn-danger btn-sm" (click)="eliminarAlerta(alerta.id)">
+          <i class="bi bi-trash"></i> Eliminar
+        </button>
+      </td>
+    </tr>
+    <tr *ngIf="alertas.length === 0">
+      <td colspan="7" class="text-center">No hay alertas registradas.</td>
     </tr>
   </tbody>
 </table>

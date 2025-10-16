@@ -1,86 +1,125 @@
-<div class="container-fluid mt-4">
-  <h3 class="mb-4">💧 Control de Riego</h3>
-
-  <!-- Tarjeta de Acción Manual -->
-  <div class="card shadow-sm border-0 mb-4">
-    <div class="card-body">
-      <h5 class="card-title">🔧 Control Manual</h5>
-      <p class="card-text text-muted">Activa el riego manualmente por un tiempo específico.</p>
-
-      <div class="row align-items-center g-3">
-        <div class="col-md-8">
-          <input type="number" class="form-control form-control-lg" [(ngModel)]="manualDuration" placeholder="Duración en minutos" min="1">
-        </div>
-        <div class="col-md-4 d-grid">
-          <button class="btn btn-success btn-lg" (click)="startManualIrrigation()">
-            <i class="bi bi-play-circle me-2"></i>Activar Riego
-          </button>
-        </div>
-      </div>
+<div class="container mt-4">
+    <h2 class="mb-4 text-primary fw-bold">💧 Control de Riego Inteligente por Sectores</h2>
+    
+    <!-- Alerta de Feedback (Reemplaza a alert()) -->
+    <div *ngIf="feedbackMessage()" 
+         class="alert alert-dismissible fade show mb-4" 
+         [ngClass]="feedbackMessage()!.type === 'success' ? 'alert-success' : 'alert-danger'"
+         role="alert">
+        {{ feedbackMessage()!.text }}
+        <button type="button" class="btn-close" (click)="feedbackMessage.set(null)"></button>
     </div>
-  </div>
 
-  <!-- Tarjeta de Modo Automático -->
-  <div class="card shadow-sm border-0 mb-4">
-    <div class="card-body">
-      <h5 class="card-title">🤖 Modo Automático</h5>
-      <p class="card-text text-muted">Configura el sistema para activar riego automáticamente según la humedad del suelo.</p>
+    <!-- Tarjeta de Configuración Global (Modo Automático) -->
+    <div class="card shadow-lg border-2 mb-5 bg-light-subtle">
+        <div class="card-body">
+            <h4 class="card-title text-dark">🤖 Configuración Global del Sistema</h4>
+            <p class="card-text text-muted">Ajusta el modo y el umbral de humedad para el riego automático.</p>
 
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <label for="autoModeSwitch" class="form-check-label fw-bold">Activar modo automático</label>
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" id="autoModeSwitch" [(ngModel)]="autoMode">
-        </div>
-      </div>
-
-      <div class="row align-items-center g-3" [class.text-muted]="!autoMode">
-        <div class="col-md-6">
-          <label class="form-label">Umbral de Humedad (%)</label>
-          <select class="form-select form-select-lg" [(ngModel)]="moistureThreshold" [disabled]="!autoMode">
-            <option *ngFor="let threshold of moistureThresholds" [value]="threshold">
-              {{ threshold }}%
-            </option>
-          </select>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Estado actual del suelo</label>
-          <div class="progress" style="height: 30px;">
-            <div class="progress-bar bg-gradient"
-                 [ngClass]="{
-                   'bg-danger': currentMoisture <= 25,
-                   'bg-warning': currentMoisture > 25 && currentMoisture <= 40,
-                   'bg-success': currentMoisture > 40
-                 }"
-                 [style.width.%]="currentMoisture"
-                 role="progressbar">
-              {{ currentMoisture }}%
+            <div class="row align-items-center g-4">
+                <div class="col-md-5 d-flex align-items-center">
+                    <div class="form-check form-switch fs-5 me-4">
+                        <input class="form-check-input" type="checkbox" id="autoModeSwitch" 
+                               [ngModel]="autoMode()" (ngModelChange)="autoMode.set($event)">
+                        <label class="form-check-label fw-bold" for="autoModeSwitch">
+                            Modo Automático: 
+                            <span [ngClass]="autoMode() ? 'text-success' : 'text-secondary'">
+                                {{ autoMode() ? 'ACTIVO' : 'INACTIVO' }}
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Umbral de Humedad</label>
+                    <select class="form-select" [ngModel]="moistureThreshold()" (ngModelChange)="moistureThreshold.set($event)" [disabled]="!autoMode()">
+                        <option *ngFor="let threshold of moistureThresholds" [value]="threshold">
+                            {{ threshold }}% (Min necesario)
+                        </option>
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <div *ngIf="riegoAutomaticoPendiente()" class="alert alert-warning py-2 m-0 text-center fw-bold">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Riego Auto. Pendiente
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
+    
+    <h3 class="mb-3 fw-bold">📍 Control Individual de Sectores</h3>
+    
+    <!-- Cuadrícula de Control de Sectores -->
+    <div class="row g-4">
+        <div class="col-lg-6" *ngFor="let sector of sectors()">
+            <div class="card sector-card h-100 shadow-sm" 
+                 [ngClass]="{
+                    'border-danger': sector.moisture <= moistureThreshold(),
+                    'border-warning': sector.moisture > moistureThreshold() && sector.moisture < moistureThreshold() + 15,
+                    'border-success': sector.moisture >= moistureThreshold() + 15
+                 }">
+                <div class="card-header bg-white border-bottom-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold">{{ sector.name }}</h5>
+                        <span class="badge rounded-pill fs-6 py-2 px-3" 
+                              [ngClass]="sector.isRiegoActivo ? 'bg-info' : 'bg-secondary'">
+                            <i class="bi bi-funnel-fill me-1"></i> {{ sector.isRiegoActivo ? 'VÁLVULA ACTIVA' : 'Válvula Cerrada' }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-body pt-2">
+                    <!-- Humedad Actual y Progreso -->
+                    <div class="mb-3">
+                        <label class="form-label d-block fw-bold">
+                            Humedad Actual: <span class="float-end fs-5">{{ sector.moisture }}%</span>
+                        </label>
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar"
+                                 [ngClass]="getMoistureProgressClass(sector.moisture)"
+                                 [style.width.%]="sector.moisture > 100 ? 100 : sector.moisture"
+                                 role="progressbar"
+                                 [attr.aria-valuenow]="sector.moisture"
+                                 [attr.aria-valuemin]="0"
+                                 [attr.aria-valuemax]="100">
+                                <span class="fw-bold">{{ sector.moisture }}%</span>
+                            </div>
+                        </div>
+                        <!-- Mensaje de estado de alerta -->
+                        <small *ngIf="sector.moisture <= moistureThreshold()" class="text-danger fw-bold">
+                            <i class="bi bi-exclamation-circle-fill me-1"></i> ¡Humedad por debajo del umbral ({{ moistureThreshold() }}%)!
+                        </small>
+                    </div>
 
-  <!-- Información del Sistema -->
-  <div class="card shadow-sm border-0">
-    <div class="card-body">
-      <h5 class="card-title">📡 Estado del Sistema</h5>
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span><i class="bi bi-droplet-fill me-2"></i>Humedad actual</span>
-          <span class="badge bg-primary rounded-pill">{{ currentMoisture }}%</span>
-        </li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span><i class="bi bi-clock-history me-2"></i>Último ciclo</span>
-          <span class="badge bg-secondary rounded-pill">Hace 2 horas</span>
-        </li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span><i class="bi bi-power me-2"></i>Modo actual</span>
-          <span class="badge" [ngClass]="autoMode ? 'bg-success' : 'bg-info'">
-            {{ autoMode ? 'Automático' : 'Manual' }}
-          </span>
-        </li>
-      </ul>
+                    <!-- Control Manual -->
+                    <div class="input-group mb-3">
+                        <span class="input-group-text fw-bold">Duración Manual (min)</span>
+                        <input type="number" class="form-control" 
+                               [(ngModel)]="sector.manualDuration" 
+                               [disabled]="sector.isRiegoActivo"
+                               min="1">
+                        <button class="btn btn-success" 
+                                (click)="startManualIrrigation(sector.id)" 
+                                [disabled]="sector.isRiegoActivo || sector.manualDuration <= 0">
+                            <i class="bi bi-play-circle me-1"></i> Activar
+                        </button>
+                    </div>
+                    
+                    <!-- Información de Último Riego -->
+                    <div class="text-muted small mt-2">
+                        <i class="bi bi-clock-history me-1"></i> Último Riego: 
+                        {{ sector.lastIrrigationTime ? (sector.lastIrrigationTime | date:'medium') : 'Nunca registrado' }}
+                    </div>
+                    
+                    <!-- Botón de Parada de Emergencia -->
+                    <div *ngIf="sector.isRiegoActivo" class="mt-3 text-center">
+                        <button class="btn btn-danger btn-sm" (click)="stopIrrigation(sector.id, 0)">
+                            <i class="bi bi-stop-circle me-1"></i> Parada de Emergencia
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>

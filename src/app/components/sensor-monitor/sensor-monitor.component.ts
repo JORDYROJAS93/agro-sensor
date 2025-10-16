@@ -3,6 +3,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { interval, Subscription } from 'rxjs';
 import { SensorService } from '../../services/sensor.service';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas'; 
 
 interface SensorData {
   id: number;
@@ -36,7 +38,7 @@ export class SensorMonitorComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Simular actualización en tiempo real cada 3 segundos
-    this.updateSubscription = interval(3000).subscribe(() => {
+    this.updateSubscription = interval(9000).subscribe(() => {
       this.updateSensorData();
     });
   }
@@ -145,4 +147,51 @@ export class SensorMonitorComponent implements OnInit, OnDestroy {
     }
 
   }
+
+exportToPdf(): void {
+    // 1. Obtener el elemento HTML que queremos exportar (la tabla resumen)
+    const data = document.getElementById('resumenSensores');
+
+    if (data) {
+      // 2. Usar html2canvas para convertir el HTML en una imagen (canvas)
+      html2canvas(data, { 
+        scale: 2, // Aumenta la escala para mejor resolución
+        logging: true, 
+        useCORS: true 
+      }).then(canvas => {
+        const imgWidth = 208; // Ancho estándar A4 en mm (210 - 2mm de margen)
+        const pageHeight = 295; // Altura estándar A4 en mm
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        let heightLeft = imgHeight;
+
+        // 3. Inicializar jsPDF
+        const pdf = new jsPDF('p', 'mm', 'a4'); // 'p': portrait, 'mm': unidades, 'a4': tamaño
+
+        // Añadir título y fecha
+        pdf.setFontSize(18);
+        pdf.text('Informe de Monitoreo - Agro-Sensor', 10, 15);
+        pdf.setFontSize(10);
+        pdf.text(`Fecha de Reporte: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, 10, 22);
+        
+        // 4. Calcular dónde colocar la imagen en el PDF
+        let position = 30; // Inicio de la posición de la imagen después del título
+
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 1, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        // Manejar el caso de que la tabla sea demasiado larga (múltiples páginas)
+        while (heightLeft >= 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 1, position + 30, imgWidth, imgHeight); // Ajuste de 30mm para margen superior
+          heightLeft -= pageHeight;
+        }
+        
+        // 5. Descargar el archivo
+        pdf.save(`Reporte_Sensores_${new Date().toISOString().slice(0, 10)}.pdf`);
+      });
+    }
+  }
+
+
 }
